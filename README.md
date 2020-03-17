@@ -1,11 +1,12 @@
 
 
 
-# e-Kréta API dokumentáció
+# e-Kréta API (v2) dokumentáció
 
-*Krétás API-knak nem hivatalos gyűjteménye*
+*Krétás API-oknak nem hivatalos gyűjteménye*
+*Eredeti dokumentációt készítette [Boapps](https://github.com/boapps)*
 
-Ezen lekérdezések nagy részét egy [SSL Capture](https://play.google.com/store/apps/details?id=com.minhui.networkcapture) nevű Androidos alkalmazással szereztem.
+Ezen lekérdezések nagy részét egy [HttpCanary](https://httpcanary.com/en/download.html) nevű Androidos alkalmazással szereztem.
 
 A webes KRÉTA API dokumentációját [itt találod](https://github.com/Xerren09/eKreta-WebAPI-documentation). ([Xerren09](https://github.com/Xerren09) készítette)
 
@@ -28,6 +29,8 @@ A webes KRÉTA API dokumentációját [itt találod](https://github.com/Xerren09
  * [gokreta](https://github.com/thegergo02/gokreta) Go implementációja a Kréta API-nak.
  * [K Napló](https://github.com/Gbr22/knaplo) Nem hivatalos Kréta webapp. https://naplo.gbr22.me/
  * [CursedKreta](https://github.com/thegergo02/cursedkreta) Konzolos (terminál) kliens a Krétához, go-ban.
+ * [CursedKreta](https://github.com/filcnaplo/filcnaplo) Egy újgenerációs kliensalkalmazás az e-Kréta rendszerhez, újraélesztve
+
  
 
 ## Figyelem! Ismert problémák az API-val:
@@ -35,21 +38,21 @@ A webes KRÉTA API dokumentációját [itt találod](https://github.com/Xerren09
 **A KRÉTA API-ja nem követi az HTTP standardot:**
 
 Ez azért nem célszerű, mert így egyes nyelvekekben (pl.: Swift, Dart), amikben nem lehet kisbetűs Headert beállítani, mert bizonyos lekérdezések (iskolák listája) nem lehetségesek a KRÉTA hivatalos API-jából.
-Többek között emiatt (és a nem kikapcsolható reklámok miatt) azt a megoldást találtuk ki, hogy az iskolák listáját oránként frissítjuk és [saját szerveren](https://e-szivacs.org) hosztoljuk.
+Többek között emiatt azt a megoldást találtuk ki, hogy az iskolák listáját (jelenleg) havonta frissítjuk és saját szerveren hosztoljuk.
+([api.novy.vip](https://api.novy.vip/schoolList.json))
 
 **Nem célszerű használat és a *apiKey/client_id*:**
 Megkeresésünkre a Krétások azt írták e-mailbe, hogy visszafejtésből megszerzett kulcsokat nem lenne szabad használni, ami szerintünk azért sem helyes, mert vagy a lekérésekhez mindenki ugyanazt a kulcsot használja, vagy a kulcsot nem csak visszafejtésből lehet megszerezni, hanem konkrétan midnen bejelentkezéskor  a KRÉTA által kiadott token tartalmazza a *client_id*-nek hívott kulcsot.
 
-**Kötelező header**
+**Kötelező useragent header**
 
-Jelenlegi tudásunk szerint a KRÉTA blokkolja azokat a lekérdezéseket, amelyek *User-Agent*-je egyezik a "szivacs_naplo" szöveggel, akár nagybetűvel, akár kisbetűvel. Ez a blokkolás viszont (még) nem az összes Krétás szerverre vonatkozik, csak a "2-kaffee" nevű, leggyakrabban a "klik"-el kezdődű intézménykódú iskolák által használt szeverrel. Magyarul kb. 80%-a az iskolálnak Szivacs Naplóval blokkolva van.
-**Mindezek ellenéré tudtunkal még nincsen kötelező header.**
+Jelenleg nincs kötelező useragent header, bár használata javasolt.
 
 
 ## Iskolák lekérdezése
 #### Az összes iskola ahol be van vezetve az e-Kréta:  
 ```bash
-curl -H "apiKey: 7856d350-1fda-45f5-822d-e1a2f3f1acf0"  https://kretaglobalmobileapi.ekreta.hu/api/v1/Institute
+curl -H "apiKey: 7856d350-1fda-45f5-822d-e1a2f3f1acf0"  https://kretaglobalmobileapi2.ekreta.hu/api/v2/Institute
 ```
 * apiKey: kötelező bizonyos lekérdezésekhez, mindenkinek ugyanaz:
     * `7856d350-1fda-45f5-822d-e1a2f3f1acf0` (a Krétások szerint ez a kulcs nem nyilvános, annak ellenéré, hogy mindenki ezt használja)
@@ -73,21 +76,21 @@ curl -H "apiKey: 7856d350-1fda-45f5-822d-e1a2f3f1acf0"  https://kretaglobalmobil
 ```
 #### Egy iskola adatainak lekérése ID alapján:
 ```bash
-curl -H "apiKey: 7856d350-1fda-45f5-822d-e1a2f3f1acf0"  https://kretaglobalmobileapi.ekreta.hu/api/v1/Institute/3928
+curl -H "apiKey: 7856d350-1fda-45f5-822d-e1a2f3f1acf0"  https://kretaglobalmobileapi2.ekreta.hu/api/v2/Institute/3928
 ```
 
 #### A szerver válasza:  
 ```json
 {
-  "InstituteId": 3928,
-  "InstituteCode": "appteszt",
-  "Name": "PedApp Teszt Intézmény",
-  "Url": "https://appteszt.ekreta.hu",
-  "City": "Budapest",
-  "AdvertisingUrl": "",
-  "FeatureToggleSet": {
-    "JustificationFeatureEnabled": "false"
-  }
+    "instituteId": 3928,
+    "instituteCode": "appteszt",
+    "name": "PedApp Teszt Intézmény",
+    "city": "Budapest",
+    "url": "https://appteszt.ekreta.hu",
+    "advertisingUrl": "",
+    "informationImageUrl": "",
+    "informationUrl": "",
+    "featureToggleSet": {}
 }
 ```
 ## API linkek lekérdezése
@@ -105,6 +108,51 @@ curl http://kretamobile.blob.core.windows.net/configuration/ConfigurationDescrip
   "GlobalMobileApiUrlTEST": "https://kretaglobalmobileapitest.ekreta.hu",
   "GlobalMobileApiUrlUAT": "https://kretaglobalmobileapiuat.ekreta.hu",
   "GlobalMobileApiUrlPROD": "https://kretaglobalmobileapi.ekreta.hu"
+}
+```
+
+## Verziók lekérése
+#### Lekéri a KRÉTA alkalmazással kapcsolatos adatokat
+```bash
+curl http://kretamobile.blob.core.windows.net/configuration/EllenorzoMobilVersionInfo.json
+```
+* igazából egy mezei böngészőből is [végrehajtható](http://kretamobile.blob.core.windows.net/configuration/EllenorzoMobilVersionInfo.json)
+* mire jó: Feketelistás verziók,legújabb verzió és letöltési linket tárolja
+
+#### A szerver válasza:  
+```json
+{
+   "LatestVersion": 0,
+   "MinimumSupportedVersion": 0,
+   "BlacklistPlatformByMobileBuildVersion": [
+	{
+			"MobileBuildVersions":"2.6.2.2018092801",
+			"Platform": "Android"
+	},
+	{
+			"MobileBuildVersions":"2.6.1.2018090501",
+			"Platform": "Android"
+	},
+	{
+			"MobileBuildVersions":"2.6.0.2018090302",
+			"Platform": "Android"
+	},
+	{
+			"MobileBuildVersions":"2.5.5.2018062001",
+			"Platform": "Android"
+	},
+	{
+			"MobileBuildVersions":"2.4.4.201804051",
+			"Platform": "Android"
+	}
+   ],
+   "GDPRLink": "https://tudasbazis.ekreta.hu/pages/viewpage.action?pageId=4065038",
+   "GDPRUpdateDate" : "2018-08-20T21:00:00Z",
+   "AndroidMobileStoreUrl" : "market://details?id=hu.eKreta.KretaAndroid",
+   "IOSMobileStoreUrl" : "itms-apps://itunes.apple.com/app/id1169400318",
+   "AndroidMobileTeacherStoreUrl" : "market://details?id=hu.ekreta.naplo",
+   "IOSMobileTeacherStoreUrl" : "itms-apps://itunes.apple.com/app/id1434586902",
+   "MinimumSupportedClientBuildNumber" : "20191030"
 }
 ```
 
@@ -168,10 +216,11 @@ Ahol az *"aud"* egyezik a client_id-vel. Érdekes, nem csak visszafejtéssel leh
 #### A szerver válasza:
 ```json
 {
- "access_token":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
- "refresh_token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
- ...
- }
+    "access_token": "xxxx",
+    "token_type": "bearer",
+    "expires_in": 3599,
+    "refresh_token": "xxxx"
+}
 ```
 
 ### `access_token` frissítése
@@ -340,7 +389,7 @@ A szerver válasza:
 * kell hozzá a Bearer azonosító (lásd: bejelentkezés)
 
 ```bash
-curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/Student?fromDate=xx-xx-xx&toDate=xx-xx-xx
+curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/StudentAmi?fromDate=xx-xx-xx&toDate=xx-xx-xx
 ```
 
 * fromDate: ettől a dátumtól kezdődően mutasson jegyeket, hiányzást és feljegyzést (a "Date" legyen nagyobb vagy egyenlő ennél)
@@ -349,124 +398,134 @@ curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Ha nem szeretnénk dátumhoz kötni, lehet az xx-xx-xx helyére null-t is írni vagy az egészet le lehet hagyni.
 
 ```bash
-curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/Student?fromDate=null&toDate=null
+curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/StudentAmi?fromDate=null&toDate=null
 ```
 ```bash
-curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/Student
+curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/StudentAmi
 ```
 
 #### A szerver válasza:
 ```json
 {
-  "StudentId": 0000000,
-  "SchoolYearId": 0000000,
-  "Name": "Xxxxx Xxxxx",
-  "NameOfBirth": "Xxxxx Xxxxx",
-  "PlaceOfBirth": "Xxxxx Xxxxx",
-  "MothersName": "Xxxxx Xxxxx",
-  "AddressDataList": [
-    "Xxxxx Xxxxx, Xxxxx Xxxxx xxxx    "
-  ],
-  "DateOfBirthUtc": "0000-00-00T22:00:00Z",
-  "InstituteName": "Xxxxx Xxxxx Xxxxx Xxxxx Xxxxx Xxxxx",
-  "InstituteCode": "xxxxxxxxxxx",
-  "Evaluations": [
-    {
-      "EvaluationId": 12345678,
-      "Form": "Mark",
-      "FormName": "Elégtelen (1) és Jeles (5) között az öt alapértelmezett érték",
-      "Type": "MidYear",
-      "TypeName": "Évközi jegy/értékelés",
-      "Subject": "Xxxxxxxx",
-      "SubjectCategory": null,
-      "SubjectCategoryName": "Xxxxxxxx",
-      "Theme": "xxxxxxx",
-      "IsAtlagbaBeleszamit": true,
-      "Mode": "Gyakorlati feladat",
-      "Weight": "100%",
-      "Value": "Jeles(5)",
-      "NumberValue": 5,
-      "SeenByTutelaryUTC": null,
-      "Teacher": "Xxxxxxxx Xxxxxxxx",
-      "Date": "2019-06-07T00:00:00",
-      "CreatingTime": "2019-06-07T08:00:00.000",
-      "Jelleg": {
-        "Id": 1,
-        "Nev": "Ertekeles",
-        "Leiras": "Értékelés"
-      },
-      "JellegNev": "Ertekeles",
-      "ErtekFajta": {
-        "Id": 1,
-        "Nev": "Osztalyzat",
-        "Leiras": "Osztályzat"
-      }
-    },
-    ...
-  ],
-  "SubjectAverages": [
-    {
-      "Subject": "Xxxxxxxx",
-      "SubjectCategory": null,
-      "SubjectCategoryName": "Xxxxxxxx xx Xxxxxxxx",
-      "Value": 0.0,
-      "ClassValue": 0.00,
-      "Difference": -0.00
-    },
-    ...
-  ],
-  "Absences": [
-    {
-      "AbsenceId": 0000000,
-      "Type": "Absence",
-      "TypeName": "Hiányzás",
-      "Mode": "Lesson",
-      "ModeName": "Tanórai mulasztás",
-      "Subject": "Xxxxxx xxxxx",
-      "SubjectCategory": null,
-      "SubjectCategoryName": "Xxxxxxxx xx Xxxxxxxx",
-      "DelayTimeMinutes": 0,
-      "Teacher": "Xxxxxxxx Xxxxxxxx",
-      "LessonStartTime": "0000-00-00T00:00:00",
-      "NumberOfLessons": 0,
-      "CreatingTime": "0000-00-00T00:00:00.000",
-      "JustificationState": "BeJustified",
-      "JustificationStateName": "Igazolandó mulasztás",
-      "JustificationType": "UnJustified",
-      "JustificationTypeName": "Igazolatlan",
-      "SeenByTutelaryUTC": null
-    },
-    ...
-      ],
-  "Notes": [
-    {
-      "NoteId": 0000000,
-      "Type": "Elektronikus üzenet",
-      "Title": "Xxxxxxxx",
-      "Content": "Xxxxxx xxxxxx x xxxxxx xxxxxx xxx xxxxxx.",
-      "SeenByTutelaryUTC": null,
-      "Teacher": "Xxxxxx Xxxxxx",
-      "Date": "0000-00-00T00:00:00",
-      "CreatingTime": "0000-00-00T00:00:00.000"
-    },
-    ...
-      ],
-  "Lessons": null,
-  "Events": null,
-  "FormTeacher": {
-    "TeacherId": 0000000,
-    "Name": "Xxxxxxx Xxxxxxx",
-    "Email": null,
-    "PhoneNumber": null
-  },
-  "Tutelaries": [
-    {
-      "TutelaryId": 0000,
-      "Name": "Xxxxxx Xxxxxxx",
-      "Email": "",
-      "PhoneNumber": "000000000"
-    }
-  ]
+    "StudentId": 111111,
+    "SchoolYearId": 3653,
+    "Name": "Novy Soft",
+    "NameOfBirth": "Novy Soft",
+    "PlaceOfBirth": "Budapest XVI. kerület",
+    "MothersName": "Novy",
+    "AddressDataList": [
+        "Budapest XVI. ker. (1161) ..."
+    ],
+    "DateOfBirthUtc": "2000-00-00T00:00:00Z",
+    "InstituteName": "PedApp Teszt Intézmény",
+    "InstituteCode": "appteszt",
+    "Evaluations": [{
+        "EvaluationId": 11111111,
+        "Form": "Mark",
+        "FormName": "Elégtelen (1) és Jeles (5) között az öt alapértelmezett érték",
+        "Type": "MidYear",
+        "TypeName": "Évközi jegy/értékelés",
+        "Subject": "fizika",
+        "SubjectCategory": null,
+        "SubjectCategoryName": "Fizika",
+        "Theme": "Ohm-törvény",
+        "IsAtlagbaBeleszamit": true,
+        "Mode": "Írásbeli röpdolgozat",
+        "Weight": "100%",
+        "Value": "Jeles(5)",
+        "NumberValue": 5,
+        "SeenByTutelaryUTC": null,
+        "Teacher": "MS. Fizika tanárnő",
+        "Date": "2020-03-06T00:00:00",
+        "CreatingTime": "2020-03-08T21:01:09.573",
+        "Jelleg": {
+            "Id": 1,
+            "Nev": "Ertekeles",
+            "Leiras": "Értékelés"
+        },
+        "JellegNev": "Ertekeles",
+        "ErtekFajta": {
+            "Id": 1,
+            "Nev": "Osztalyzat",
+            "Leiras": "Osztályzat"
+        },
+        "OsztalyCsoportUid": "111111"
+    }],
+    "SubjectAverages": null,
+    "Absences": [{
+        "AbsenceId": 1111111,
+        "Type": "Absence",
+        "TypeName": "Hiányzás",
+        "Mode": "Lesson",
+        "ModeName": "Tanórai mulasztás",
+        "Subject": "magyar nyelv",
+        "SubjectCategory": null,
+        "SubjectCategoryName": "Magyar nyelv és irodalom",
+        "DelayTimeMinutes": 0,
+        "Teacher": "MS. Magyar tanárnő",
+        "LessonStartTime": "2019-10-10T00:00:00",
+        "NumberOfLessons": 5,
+        "CreatingTime": "2019-10-10T09:04:50.22",
+        "JustificationState": "Justified",
+        "JustificationStateName": "Igazolt mulasztás",
+        "JustificationType": "Undefined",
+        "JustificationTypeName": "Ismeretlen érték",
+        "SeenByTutelaryUTC": null,
+        "OsztalyCsoportUid": "111111"
+    }],
+    "Notes": [{
+        "NoteId": 111111,
+        "Type": "Elektronikus üzenet",
+        "Title": "Koronavírus",
+        "Content": "2020.03.16-tól online oktatás lesz, kérjük gyermeke ne jöjjön az iskolába.\r\n",
+        "SeenByTutelaryUTC": null,
+        "Teacher": "Rendszerüzenet",
+        "Date": "2020-03-15T15:31:14.137",
+        "CreatingTime": "2020-03-15T15:31:14.137",
+        "OsztalyCsoportUid": null
+    }],
+    "OsztalyCsoportok": [{
+        "OktatasNevelesiFeladat": {
+            "Uid": "1111",
+            "Leiras": "Általános iskola",
+            "Nev": "altalanos_iskola"
+        },
+        "OktatasNevelesiKategoria": {
+            "Uid": "1112",
+            "Leiras": "Nevelés-oktatás",
+            "Nev": "NevelesOktatas"
+        },
+        "Nev": "8.a",
+        "OsztalyCsoportTipus": "Osztaly",
+        "IsAktiv": true,
+        "Uid": "111111",
+        "OsztalyfonokUid": "123456"
+    }],
+    "Lessons": null,
+    "Events": null,
+    "FormTeacher": null,
+    "Osztalyfonokok": [{
+        "Uid": "123456",
+        "Tanar": {
+            "Uid": "123456",
+            "Alkalmazott": {
+                "Uid": "123456",
+                "Nev": "MS. Osztályfőnok",
+                "Telefonok": [],
+                "Emailek": []
+            }
+        },
+        "Osztalyai": [{
+            "Uid": "111111",
+            "Nev": "8.a"
+        }]
+    }],
+    "Tutelaries": [{
+        "TutelaryId": 11111,
+        "Name": "Novy",
+        "Email": "novy@novy.eznemigaziemail.123",
+        "PhoneNumber": "+36xxxxxxxxxx"
+    }]
 }
 ```
 #### Jegyek:
@@ -474,16 +533,36 @@ curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 * Form: lehet "Mark": sima jegy; "Text": szöveges értékelés
 * Fejlesztőknek figyelem: az `EvaluationId`-t NEM SZABAD egyedi azonosítóként kezelni, az összetartozó (de nyilván különböző) magatartás és szorgalom jegyek ugyanazt az "id"-t kapják. Tehát két jegy néha ugyanazt az id-t kapja. Megoldás lehet az `EvaluationId` végére illeszteni (concatenatelni stringként) a `Jelleg`-nek az `Id`-jét.
 
+## Események lekérése
+###  Az események lekérése (hasonló a feljegyzésekhez)
+* a mobil alkalmazás használja
+* kell hozzá a Bearer azonosító (lásd: bejelentkezés)
+
+```bash
+curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/EventAmi
+ ```
+#### Szerver válasz:
+```json
+[{
+  "EventId": 111111,
+  "Title": "Koronavírus",
+  "Content": "...\r\n",
+  "SeenByTutelaryUTC": null,
+  "EndDate": null,
+  "Date": "2020-03-15T15:31:14.137",
+}]
+```
 ## Bejelentett számonkérések lekérdezése
 ###  Lekéri a tanárok által bejelentett dolgozatokat
 * a mobil alkalmazás használja
 * kell hozzá a Bearer azonosító (lásd: bejelentkezés)
 
 ```bash
-curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/BejelentettSzamonkeres
+curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/BejelentettSzamonkeresAmi?DatumTol=2018-09-03&DatumIg=2018-09-09
  ```
 
 #### A szerver válasza nekem: semmi, mert nálunk egy tanár sem használja nálunk ezt a funkciót
+A *Datumtol* és *Datumig* elhagyható vagy null és írható a helyére.
  
 ## Órarend lekérése
 ### Lekéri két adott időpont között megtartott (vagy elmaradt) tanórákat
@@ -494,7 +573,7 @@ curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 * toDate: a vizsgált időintervallum vége (ÉÉÉÉ-HH-NN)
 
 ```bash
-curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/Lesson?fromDate=2018-09-03&toDate=2018-09-09
+curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/LessonAmi?fromDate=2018-09-03&toDate=2018-09-09
 ```
 
 #### A szerver válasza:
@@ -575,6 +654,38 @@ Válasz:
   ...
 ]
 ```
+
+## Tanári házi feladat lekérése
+
+* Lekéri egy tanár által felírt házit egy ID alapján
+* Az ID-t csak abból az órából lehet lekérni, amiben felírtak házit, tehát végig kell vizsgálni az összes órát például 1 héten, hogy lekérjük az aheti házikat
+* Ha diák töltötte fel a házit, amihez az ID tartozik, akkor a válasz üres
+
+```bash
+curl -H "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  https://xxxxxxxxxxx.e-kreta.hu/mapi/api/v1/HaziFeladat/TanarHaziFeladat/HAZIFELADATID
+```
+
+* HAZIFELADATID: egy ID, amit az órarendből kérhetünk le (TeacherHomeworkId)
+
+Válasz:
+
+```json
+{
+    "Uid": "11111",
+    "Id": 11111,
+    "OsztalyCsoportUid": "111111",
+    "Tantargy": "biológia",
+    "Rogzito": "MS. Biológia tanár",
+    "IsTanarRogzitette": true,
+    "Oraszam": 1,
+    "TanitasiOraId": 5550957,
+    "Szoveg": "<p>Tk.124.o-126.o.&nbsp;</p>",
+    "FeladasDatuma": "2020-03-17T00:00:00",
+    "Hatarido": "2020-03-19T00:00:00",
+    "IsTanuloHaziFeladatEnabled": true
+}
+```
+
 
 ## Tanulói házi felírása
 
