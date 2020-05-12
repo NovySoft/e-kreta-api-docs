@@ -671,18 +671,20 @@ Válasz:
 
 ```json
 {
-    "Uid": "11111",
-    "Id": 11111,
-    "OsztalyCsoportUid": "111111",
-    "Tantargy": "biológia",
-    "Rogzito": "MS. Biológia tanár",
-    "IsTanarRogzitette": true,
-    "Oraszam": 1,
-    "TanitasiOraId": 5550957,
-    "Szoveg": "<p>Tk.124.o-126.o.&nbsp;</p>",
-    "FeladasDatuma": "2020-03-17T00:00:00",
-    "Hatarido": "2020-03-19T00:00:00",
-    "IsTanuloHaziFeladatEnabled": true
+  "Uid": "11111",
+  "Id": 11111,
+  "OsztalyCsoportUid": "1111",
+  "Tantargy": "matematika",
+  "Rogzito": "Tanár",
+  "IsTanarRogzitette": true,
+  "Oraszam": 2,
+  "TanitasiOraId": 111111,
+  "Szoveg": "<p>Hazifeladat HTMLbe</p>",
+  "FeladasDatuma": "2020-05-11T00:00:00",
+  "Hatarido": "2020-05-13T00:00:00",
+  "RogzitesIdopontja": "2020-05-11T13:31:33.98",
+  "IsTanuloHaziFeladatEnabled": true,
+  "IsMegoldva": false
 }
 ```
 
@@ -713,4 +715,13 @@ Válasz:
 
 ```bash
 curl -X DELETE -H "Authorization:Bearer XXXXXXXXXXXXXXXXX" -H "Content-Type:application/json; charset=utf-8" -H "Host:klik00000000.e-kreta.hu" -d '{"id":"000"}' "https://klik0000000.e-kreta.hu/mapi/api/v1/HaziFeladat/DeleteTanuloHaziFeladat/000"
+```
+
+## Házi késznek jelölése
+
+* Megjelöli a házifeladatot késznek
+* Az adott házi készen létét a házi lekérésénél tudjuk látni
+
+```bash
+curl https://klikxxxxxxxxx.e-kreta.hu/mapi/api/v1/HaziFeladat/Megoldva -H "Authorization:Bearer XXXXXXXXXXXXXXXXX" -d {"TanarHaziFeladatId":"ID","IsMegoldva":"True"}
 ```
