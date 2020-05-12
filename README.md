@@ -29,7 +29,7 @@ A webes KRÉTA API dokumentációját [itt találod](https://github.com/Xerren09
  * [gokreta](https://github.com/thegergo02/gokreta) Go implementációja a Kréta API-nak.
  * [K Napló](https://github.com/Gbr22/knaplo) Nem hivatalos Kréta webapp. https://naplo.gbr22.me/
  * [CursedKreta](https://github.com/thegergo02/cursedkreta) Konzolos (terminál) kliens a Krétához, go-ban.
- * [CursedKreta](https://github.com/filcnaplo/filcnaplo) Egy újgenerációs kliensalkalmazás az e-Kréta rendszerhez, újraélesztve
+ * [FilcNaplo](https://github.com/filcnaplo/filcnaplo) Egy újgenerációs kliensalkalmazás az e-Kréta rendszerhez, újraélesztve
 
  
 
